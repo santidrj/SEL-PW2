@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "sel-pw2"
+version = "0.1.0"
+description = ""
+authors = ["Santiago del Rey <59149491+santidrj@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.22.3"
+pandas = "^1.4.2"
+cart = "^1.2.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

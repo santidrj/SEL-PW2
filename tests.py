@@ -2,6 +2,7 @@ import logging
 
 import pandas as pd
 
+from sklearn.metrics import classification_report
 from src.classifiers import CART
 
 logging.basicConfig(level=logging.DEBUG)
@@ -17,3 +18,7 @@ cart = CART()
 labels = df['class'].to_numpy()
 cart.fit(df)
 print(cart)
+predictions = cart.predict(df.iloc[:, :-1])
+print(classification_report(labels, predictions))
+
+

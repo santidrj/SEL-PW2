@@ -7,9 +7,9 @@ from pandas import DataFrame
 
 
 def powerset(iterable):
-    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(1, len(s)+1))
+    return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
+
 
 class TreeNode:
     def __init__(self, data, is_leaf=False):
@@ -20,7 +20,6 @@ class TreeNode:
 
 
 class CART:
-
     def __init__(self, max_depth=-1, min_size=1):
         self.max_depth = max_depth
         self.min_size = min_size
@@ -30,13 +29,13 @@ class CART:
         self.numerical_columns = None
         self.logger = logging.getLogger('CART')
 
-        self.validate_input()
+        self._validate_input()
 
     def __str__(self):
         s = "Preorder representation:\n"
         return s + self._print_tree(self.root)
 
-    def validate_input(self):
+    def _validate_input(self):
         if self.max_depth == 0:
             raise ValueError("max_depth must be greater than 0 or -1 for no depth check.")
         if self.min_size < 1:
@@ -49,6 +48,12 @@ class CART:
         initial_split = self._get_split(X)
         self.root = TreeNode(initial_split)
         self._split(self.root, 1)
+
+    def predict(self, X):
+        predictions = []
+        for _, sample in X.iterrows():
+            predictions.append(self.__predict_sample(self.root, sample))
+        return np.array(predictions)
 
     def _split(self, node, depth):
         left = node.data['split'][0].copy()
@@ -92,7 +97,8 @@ class CART:
             # exit if it finds a split with the best possible gini index.
             if best_gini == 0.0:
                 break
-        self.logger.info(f'Final split with gini index {best_gini} using feature {best_feature} and value/s {best_value}')
+        self.logger.info(
+            f'Final split with gini index {best_gini} using feature {best_feature} and value/s {best_value}')
         return {'feature': best_feature, 'value': best_value, 'split': best_split}
 
     def _generate_splits(self, X, col):
@@ -104,15 +110,16 @@ class CART:
         else:
             col_values = powerset(col_data.unique())
 
-        for v in col_values:
+        max_combinations = 2 ** (col_data.nunique() - 1) - 1
+        for i, v in enumerate(col_values):
             gini_idx, split = self._feature_splits(X, col_data, v, numerical)
             if gini_idx < best_gini:
                 best_split = split
                 best_gini = gini_idx
                 best_value = v
 
-            # exit if it finds a split with the best possible gini index.
-            if best_gini == 0.0:
+            # exit if it finds a split with the best possible gini index or we have explored all possible combinations.
+            if best_gini == 0.0 or i >= max_combinations:
                 break
 
         self.logger.info(f'Best split: {best_split} with gini index {best_gini}')
@@ -157,7 +164,25 @@ class CART:
             if node.data['feature'] in self.numerical_columns:
                 s = f'At level {depth} [{node.data["feature"]} <= {node.data["value"]}?]\n'
             else:
-                s = f'At level {depth} [{node.data["feature"]} is {node.data["value"]}?]\n'
+                condition = ""
+                for f in node.data['value']:
+                    condition += f' {f} or'
+                condition = condition[:-3]  # remove last or
+                s = f'At level {depth} [{node.data["feature"]} is{condition}?]\n'
             s += self._print_tree(node.left, depth + 1)
             s += self._print_tree(node.right, depth + 1)
             return s
+
+    def __predict_sample(self, node, sample):
+        if node.is_leaf:
+            return node.data
+
+        if node.data['feature'] in self.numerical_columns:
+            left = sample[node.data['feature']] <= node.data['value']
+        else:
+            left = sample[node.data['feature']] in node.data['value']
+
+        if left:
+            return self.__predict_sample(node.left, sample)
+        else:
+            return self.__predict_sample(node.right, sample)

@@ -3,6 +3,8 @@ from itertools import chain, combinations
 from typing import Tuple
 
 import numpy as np
+import pandas as pd
+from numpy.random import RandomState, Generator
 from pandas import DataFrame
 
 
@@ -20,14 +22,41 @@ class TreeNode:
 
 
 class CART:
-    def __init__(self, max_depth=-1, min_size=1):
+    """
+    Implementation of the CART method.
+
+    Parameters
+    ----------
+    max_depth : int, default=-1
+        The maximum depth for the generated tree.
+        If max_depth is -1 the method will run until the tree can no longer grow.
+
+    min_size : int, default=1
+        The minimum size that each leaf node must have.
+
+    n_features : int, default=-1
+        The number of features to randomly select for the split of nodes.
+        If n_features is -1 all the features will be used.
+
+    random_state : int, Generator or None, default=None
+        Controls the pseudo number generator for selecting the split features.
+    """
+
+    def __init__(self, max_depth=-1, min_size=1, n_features=-1, random_state=None):
         self.max_depth = max_depth
         self.min_size = min_size
+        self.n_features = n_features
         self.root = None
         self.classes = None
         self.columns = None
         self.numerical_columns = None
+        self.rule_count = {}
         self.logger = logging.getLogger('CART')
+
+        if isinstance(random_state, Generator):
+            self.rng = random_state
+        else:
+            self.rng = np.random.default_rng(random_state)
 
         self._validate_input()
 
@@ -40,22 +69,34 @@ class CART:
             raise ValueError("max_depth must be greater than 0 or -1 for no depth check.")
         if self.min_size < 1:
             raise ValueError("min_size must be greater than 0.")
+        if self.n_features == 0:
+            raise ValueError("n_features must be greater than 0 or -1 to use all features.")
 
-    def fit(self, X):
-        self.numerical_columns = X.select_dtypes(include='number').columns
-        self.columns = X.iloc[:, :-1].columns
-        self.classes = X.iloc[:, -1].unique()
-        initial_split = self._get_split(X)
+    def fit(self, X, y):
+        if not isinstance(X, DataFrame):
+            x = np.hstack((X, y.reshape(-1, 1)))
+            x = pd.DataFrame(x)
+        else:
+            x = pd.concat([X, y], axis=1)
+            x.columns = [*x.columns[:-1], 'class']
+        self.numerical_columns = x.select_dtypes(include='number').columns
+        self.classes = x.iloc[:, -1].unique()
+        initial_split = self._get_split(x)
         self.root = TreeNode(initial_split)
-        self._split(self.root, 1)
+        self._grow_tree(self.root, 1)
 
     def predict(self, X):
+        if not isinstance(X, DataFrame):
+            x = pd.DataFrame(X)
+        else:
+            x = X.copy()
+
         predictions = []
-        for _, sample in X.iterrows():
+        for _, sample in x.iterrows():
             predictions.append(self.__predict_sample(self.root, sample))
         return np.array(predictions)
 
-    def _split(self, node, depth):
+    def _grow_tree(self, node, depth):
         left = node.data['split'][0].copy()
         right = node.data['split'][1].copy()
         if len(left) < 1 or len(right) < 1:
@@ -74,18 +115,23 @@ class CART:
         else:
             left_split = self._get_split(left)
             node.left = TreeNode(left_split)
-            self._split(node.left, depth + 1)
+            self._grow_tree(node.left, depth + 1)
 
         if len(right) <= self.min_size:
             node.right = TreeNode(right.iloc[0, -1], True)
         else:
             right_split = self._get_split(right)
             node.right = TreeNode(right_split)
-            self._split(node.right, depth + 1)
+            self._grow_tree(node.right, depth + 1)
 
     def _get_split(self, X):
         best_gini, best_value, best_feature, best_split = np.Inf, None, None, None
-        for c in self.columns:
+
+        f_idx = X.columns[:-1]
+        if self.n_features > 0:
+            f_idx = self.rng.choice(f_idx, size=self.n_features, replace=False)
+
+        for c in f_idx:
             split, value, gini_idx = self._generate_splits(X, c)
 
             if gini_idx < best_gini:
@@ -97,6 +143,11 @@ class CART:
             # exit if it finds a split with the best possible gini index.
             if best_gini == 0.0:
                 break
+
+        if len(best_split[0]) > 0 and len(best_split[1]) > 0:
+            self.rule_count[best_feature] = self.rule_count.get(best_feature, {})
+            self.rule_count[best_feature][best_value] = self.rule_count[best_feature].get(best_value, 0) + 1
+
         self.logger.info(
             f'Final split with gini index {best_gini} using feature {best_feature} and value/s {best_value}')
         return {'feature': best_feature, 'value': best_value, 'split': best_split}
@@ -159,16 +210,16 @@ class CART:
 
     def _print_tree(self, node, depth=0):
         if node.is_leaf:
-            return f'At level {depth} {node.data}\n'
+            return f'At level {depth} class {node.data}\n'
         else:
             if node.data['feature'] in self.numerical_columns:
-                s = f'At level {depth} [{node.data["feature"]} <= {node.data["value"]}?]\n'
+                s = f'At level {depth} [feature {node.data["feature"]} <= {node.data["value"]}?]\n'
             else:
                 condition = ""
                 for f in node.data['value']:
                     condition += f' {f} or'
                 condition = condition[:-3]  # remove last or
-                s = f'At level {depth} [{node.data["feature"]} is{condition}?]\n'
+                s = f'At level {depth} [feature {node.data["feature"]} is{condition}?]\n'
             s += self._print_tree(node.left, depth + 1)
             s += self._print_tree(node.right, depth + 1)
             return s

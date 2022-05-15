@@ -1,0 +1,6 @@
+Feature relevance for NT=1, F=1: ['sepal_length', 'petal_length', 'sepal_width', 'petal_width']
+Feature relevance for NT=1, F=2: ['petal_width', 'sepal_length', 'sepal_width', 'petal_length']
+Feature relevance for NT=1, F=3: ['petal_length', 'petal_width', 'sepal_length', 'sepal_width']
+Feature relevance for NT=10, F=1: ['petal_width', 'petal_length', 'sepal_length', 'sepal_width']
+Feature relevance for NT=10, F=2: ['petal_width', 'sepal_length', 'petal_length', 'sepal_width']
+Feature relevance for NT=10, F=3: ['petal_length', 'sepal_length', 'sepal_width', 'petal_width']

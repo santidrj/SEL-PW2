@@ -19,13 +19,14 @@ df = pd.DataFrame({'eye-colour': ['blue', 'blue', 'brown', 'green', 'green', 'br
                    'height': [1.96, 1.75, 1.75, 1.63, 1.96, 1.45, 1.53, 1.69, 1.49, 1.85],
                    'class': ['c+', 'c+', 'c-', 'c-', 'c+', 'c-', 'c-', 'c+', 'c-', 'c+']})
 
-iris = load_breast_cancer()
+iris = load_iris()
 x_train, x_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2)
-forest = RandomForest(10, int(log(x_train.shape[1], 2) + 1), ceil(x_train.shape[0]*0.8))
-# forest = DecisionForest(10, int(log(x_train.shape[1], 2) + 1))
+# forest = RandomForest(2, 3)
+forest = DecisionForest('Runif', 10)
 forest.fit(x_train, y_train)
 predictions = forest.predict(x_test)
 print(classification_report(y_test, predictions))
 
 ConfusionMatrixDisplay.from_predictions(y_test, predictions, normalize='true')
 plt.show()
+print(forest.rule_count())

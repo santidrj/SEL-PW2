@@ -3,30 +3,35 @@ from typing import List, Union
 import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import resample
 
 from src.classifiers import CART
 
 
-class RandomForest:
-    def __init__(self, n_features, n_trees, n_bootstrap, max_depth=-1, min_size=1, seed=None):
+class RandomForest(BaseEstimator, ClassifierMixin):
+    def __init__(self, n_features, n_trees, max_depth=-1, min_size=1, seed=None):
         self.n_features = n_features
         self.n_trees = n_trees
-        self.n_bootstrap = n_bootstrap
         self.max_depth = max_depth
         self.min_size = min_size
-        self.rule_count = {}
+        self.rules_count = {}
         self.forest: List[CART] = [None] * self.n_trees
+        self.seed = seed
         self.rng = np.random.default_rng(seed)
 
     def fit(self, X, y):
-        self.rule_count = {}
+        if self.n_features > X.shape[1]:
+            raise ValueError(f"Cannot fit data with less than {self.n_features} features.")
+
+        self.rules_count = {}
 
         for t in range(self.n_trees):
-            X_b, y_b = resample(X, y, n_samples=self.n_bootstrap, replace=False)
+            resample(X, y, random_state=self.seed)
+            x, target = resample(X, y, random_state=self.seed)
             tree = CART(max_depth=self.max_depth, min_size=self.min_size, n_features=self.n_features,
                         random_state=self.rng)
-            tree.fit(X_b, y_b)
+            tree.fit(x, target)
             self.forest[t] = tree
 
     def predict(self, X):
@@ -39,32 +44,35 @@ class RandomForest:
         return np.array(preds)
 
     def rule_count(self):
-        if self.rule_count:
-            return self.rule_count
+        if self.rules_count:
+            return list(self.rules_count.keys())
 
         for t in self.forest:
-            r = t.rule_count()
+            r = t.rule_count
             keys = list(r.keys())
             for f in keys:
-                f_v = self.rule_count.get(f, {})
+                f_v = self.rules_count.get(f, {})
                 r_v = r.get(f, {})
-                self.rule_count[f] = {k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)}
-        return self.rule_count
+                self.rules_count[f] = {k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)}
+        return list(self.rules_count.keys())
 
 
-class DecisionForest:
+class DecisionForest(BaseEstimator, ClassifierMixin):
     def __init__(self, n_features, n_trees, max_depth=-1, min_size=1, seed=None):
         self.n_features = n_features
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.min_size = min_size
-        self.rule_count = {}
+        self.rules_count = {}
         self.forest: List[CART] = [None] * self.n_trees
         self.tree_features: List[List[Union[int, str]]] = [None] * self.n_trees
         self.rng = np.random.default_rng(seed)
 
     def fit(self, X, y):
-        self.rule_count = {}
+        if isinstance(self.n_features, int) and self.n_features > X.shape[1]:
+            raise ValueError(f"Cannot fit data with less than {self.n_features} features.")
+
+        self.rules_count = {}
 
         x = X.copy()
         target = y.copy()
@@ -74,7 +82,11 @@ class DecisionForest:
             target = pd.Series(y, name='class')
 
         for t in range(self.n_trees):
-            f_idx = self.rng.choice(x.columns, size=self.n_features, replace=False)
+            if isinstance(self.n_features, str) and self.n_features == 'Runif':
+                n_features = int(self.rng.uniform(1, X.shape[1] + 1))
+                f_idx = self.rng.choice(x.columns, size=n_features, replace=False)
+            else:
+                f_idx = self.rng.choice(x.columns, size=self.n_features, replace=False)
             tree = CART(max_depth=self.max_depth, min_size=self.min_size, random_state=self.rng)
             tree.fit(x[f_idx], target)
             self.forest[t] = tree
@@ -94,14 +106,14 @@ class DecisionForest:
         return np.array(preds)
 
     def rule_count(self):
-        if self.rule_count:
-            return self.rule_count
+        if self.rules_count:
+            return list(self.rules_count.keys())
 
         for t in self.forest:
-            r = t.rule_count()
+            r = t.rule_count
             keys = list(r.keys())
             for f in keys:
-                f_v = self.rule_count.get(f, {})
+                f_v = self.rules_count.get(f, {})
                 r_v = r.get(f, {})
-                self.rule_count[f] = {k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)}
-        return self.rule_count
+                self.rules_count[f] = {k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)}
+        return list(self.rules_count.keys())

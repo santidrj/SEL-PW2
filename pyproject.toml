@@ -12,8 +12,12 @@ cart = "^1.2.1"
 condition = "^1.0.8"
 scikit-learn = "^1.1.0"
 matplotlib = "^3.5.2"
+Jinja2 = "^3.1.2"
 
 [tool.poetry.dev-dependencies]
+isort = "^5.10.1"
+black = "^22.3.0"
+Sphinx = "^4.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

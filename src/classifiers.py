@@ -4,7 +4,7 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-from numpy.random import RandomState, Generator
+from numpy.random import Generator, RandomState
 from pandas import DataFrame
 
 
@@ -51,7 +51,7 @@ class CART:
         self.columns = None
         self.numerical_columns = None
         self.rule_count = {}
-        self.logger = logging.getLogger('CART')
+        self.logger = logging.getLogger("CART")
 
         if isinstance(random_state, Generator):
             self.rng = random_state
@@ -66,11 +66,15 @@ class CART:
 
     def _validate_input(self):
         if self.max_depth == 0:
-            raise ValueError("max_depth must be greater than 0 or -1 for no depth check.")
+            raise ValueError(
+                "max_depth must be greater than 0 or -1 for no depth check."
+            )
         if self.min_size < 1:
             raise ValueError("min_size must be greater than 0.")
         if self.n_features == 0:
-            raise ValueError("n_features must be greater than 0 or -1 to use all features.")
+            raise ValueError(
+                "n_features must be greater than 0 or -1 to use all features."
+            )
 
     def fit(self, X, y):
         if not isinstance(X, DataFrame):
@@ -78,8 +82,8 @@ class CART:
             x = pd.DataFrame(x)
         else:
             x = pd.concat([X, y], axis=1)
-            x.columns = [*x.columns[:-1], 'class']
-        self.numerical_columns = x.select_dtypes(include='number').columns
+            x.columns = [*x.columns[:-1], "class"]
+        self.numerical_columns = x.select_dtypes(include="number").columns
         self.classes = x.iloc[:, -1].unique()
         initial_split = self._get_split(x)
         self.root = TreeNode(initial_split)
@@ -97,14 +101,14 @@ class CART:
         return np.array(predictions)
 
     def _grow_tree(self, node, depth):
-        left = node.data['split'][0].copy()
-        right = node.data['split'][1].copy()
+        left = node.data["split"][0].copy()
+        right = node.data["split"][1].copy()
         if len(left) < 1 or len(right) < 1:
             node.data = left.iloc[0, -1] if len(left) >= 1 else right.iloc[0, -1]
             node.is_leaf = True
             return
 
-        del (node.data['split'])
+        del node.data["split"]
         if 0 < self.max_depth <= depth:
             node.left = TreeNode(left.iloc[0, -1], True)
             node.right = TreeNode(right.iloc[0, -1], True)
@@ -146,11 +150,14 @@ class CART:
 
         if len(best_split[0]) > 0 and len(best_split[1]) > 0:
             self.rule_count[best_feature] = self.rule_count.get(best_feature, {})
-            self.rule_count[best_feature][best_value] = self.rule_count[best_feature].get(best_value, 0) + 1
+            self.rule_count[best_feature][best_value] = (
+                self.rule_count[best_feature].get(best_value, 0) + 1
+            )
 
         self.logger.info(
-            f'Final split with gini index {best_gini} using feature {best_feature} and value/s {best_value}')
-        return {'feature': best_feature, 'value': best_value, 'split': best_split}
+            f"Final split with gini index {best_gini} using feature {best_feature} and value/s {best_value}"
+        )
+        return {"feature": best_feature, "value": best_value, "split": best_split}
 
     def _generate_splits(self, X, col):
         col_data = X[col]
@@ -173,7 +180,7 @@ class CART:
             if best_gini == 0.0 or i >= max_combinations:
                 break
 
-        self.logger.info(f'Best split: {best_split} with gini index {best_gini}')
+        self.logger.info(f"Best split: {best_split} with gini index {best_gini}")
         return best_split, best_value, best_gini
 
     def _feature_splits(self, X, col_data, v, numerical):
@@ -203,21 +210,21 @@ class CART:
                 # score the group based on each class
                 for c in self.classes:
                     p = np.count_nonzero(g.iloc[:, -1] == c) / g.shape[0]
-                    score -= p ** 2
+                    score -= p**2
                 # weight the group score by size
                 gini += (g.shape[0] / n_samples) * score
         return gini
 
     def _print_tree(self, node, depth=0):
         if node.is_leaf:
-            return f'At level {depth} class {node.data}\n'
+            return f"At level {depth} class {node.data}\n"
         else:
-            if node.data['feature'] in self.numerical_columns:
+            if node.data["feature"] in self.numerical_columns:
                 s = f'At level {depth} [feature {node.data["feature"]} <= {node.data["value"]}?]\n'
             else:
                 condition = ""
-                for f in node.data['value']:
-                    condition += f' {f} or'
+                for f in node.data["value"]:
+                    condition += f" {f} or"
                 condition = condition[:-3]  # remove last or
                 s = f'At level {depth} [feature {node.data["feature"]} is{condition}?]\n'
             s += self._print_tree(node.left, depth + 1)
@@ -228,10 +235,10 @@ class CART:
         if node.is_leaf:
             return node.data
 
-        if node.data['feature'] in self.numerical_columns:
-            left = sample[node.data['feature']] <= node.data['value']
+        if node.data["feature"] in self.numerical_columns:
+            left = sample[node.data["feature"]] <= node.data["value"]
         else:
-            left = sample[node.data['feature']] in node.data['value']
+            left = sample[node.data["feature"]] in node.data["value"]
 
         if left:
             return self.__predict_sample(node.left, sample)

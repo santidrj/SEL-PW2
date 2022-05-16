@@ -8,8 +8,7 @@ DATA_DIR = "data"
 
 
 def load_iris():
-    df = pd.read_csv(os.path.join(DATA_DIR, "iris.csv"))
-    return df.drop(columns="class"), df["class"]
+    return load_dataset(os.path.join(DATA_DIR, "iris.csv"))
 
 
 def load_heart():
@@ -40,3 +39,18 @@ def load_rice():
     class_col = "Class"
     df[class_col] = df[class_col].str.decode("utf-8")
     return df.drop(columns=class_col), df[class_col]
+
+
+def load_dataset(dataset_path: str, has_class=True):
+    """
+    Load a CSV dataset.
+
+    :param dataset_path: The path to the dataset.
+    :param has_class: If the dataset contains the class labels. If True it assumes that are at the last column.
+    :return: A tuple with the data and the class labels.
+    """
+
+    df = pd.read_csv(dataset_path)
+    if has_class:
+        return df.drop(columns=df.columns[-1]), df[df.columns[-1]]
+    return df

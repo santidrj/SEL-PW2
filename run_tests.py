@@ -8,12 +8,12 @@ import pandas as pd
 from pandas import DataFrame
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
-from src.datasets import load_iris, load_dataset, load_heart, load_rice
+from src.datasets import load_dataset, load_heart, load_iris, load_rice
 from src.forest import DecisionForest, RandomForest
 
 
 def test_random_forest(
-        dataset_name, classifier_name, n_splits=5, n_jobs=None, seed=None, verbose=False
+    dataset_name, classifier_name, n_splits=5, n_jobs=None, seed=None, verbose=False
 ) -> Tuple[DataFrame, DataFrame]:
     """
     Perform cross-validation with a given dataset and classifier with a predefined number of combinations of number of
@@ -66,14 +66,20 @@ def test_random_forest(
         f = {m // 4, m // 2, 3 * m // 4, "Runif"}
 
     if verbose:
-        print(f"\nStarting tests for {classifier_name} with dataset {dataset_name}\n")
+        print(f"\nStarting tests for {classifier_name} with dataset {dataset_name}")
     if classifier_name == "RandomForest":
-        return run_cross_validation(X, y, RandomForest, dataset_name, f, n_jobs, n_splits, seed, verbose)
+        return run_cross_validation(
+            X, y, RandomForest, dataset_name, f, n_jobs, n_splits, seed, verbose
+        )
     else:
-        return run_cross_validation(X, y, DecisionForest, dataset_name, f, n_jobs, n_splits, seed, verbose)
+        return run_cross_validation(
+            X, y, DecisionForest, dataset_name, f, n_jobs, n_splits, seed, verbose
+        )
 
 
-def run_cross_validation(X, y, classifier, dataset_name, f, n_jobs, n_splits, seed, verbose):
+def run_cross_validation(
+    X, y, classifier, dataset_name, f, n_jobs, n_splits, seed, verbose
+):
     results = pd.DataFrame(index=f, columns=NT)
     results = results.rename_axis(index="F")
     index = pd.MultiIndex.from_product([NT, f], names=["NT", "F"])
@@ -104,31 +110,38 @@ def run_cross_validation(X, y, classifier, dataset_name, f, n_jobs, n_splits, se
             feature_importance.loc[(nt, n_features)] = features
             output_lines[
                 i * len(f) + j
-                ] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.rule_count()}\n"
+            ] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.rule_count()}\n"
 
             results.loc[n_features, nt] = np.mean(cv_results["test_score"])
+
     results.columns = pd.MultiIndex.from_tuples(
         map(lambda x: ("NT", x), results.columns)
     )
+    results = results.round(decimals=4)
     feature_importance.columns = pd.MultiIndex.from_tuples(
         map(lambda x: ("Feature importance", x), feature_importance.columns)
     )
+    output_file = os.path.join(OUTPUT_DIR, f"{classifier.__name__}-{dataset_name}")
+
     with open(
-            os.path.join(OUTPUT_DIR, f"{classifier}-{dataset_name}-feature-relevance.txt"),
-            "w",
+        os.path.join(OUTPUT_DIR, f"{output_file}-feature-relevance.txt"), "w"
     ) as f:
         f.writelines(output_lines)
-    tex_output = os.path.join(OUTPUT_DIR, f"{classifier}-{dataset_name}")
+
+    results.to_pickle(f"{output_file}-results.pkl")
+    feature_importance.to_pickle(f"{output_file}-feature-relevance.pkl")
+
     feature_importance.style.to_latex(
-        f"{tex_output}-feature-relevance.tex",
+        f"{output_file}-feature-relevance.tex",
         position="htbp",
         position_float="centering",
         hrules=True,
         multicol_align="c",
         label=f"{dataset_name}-features",
     )
-    results.style.to_latex(
-        f"{tex_output}-results.tex",
+    s = results.style.highlight_max(props="textbf: --rwrap", axis=0)
+    s.to_latex(
+        f"{output_file}-results.tex",
         position="htbp",
         position_float="centering",
         hrules=True,
@@ -143,11 +156,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "dataset",
         help="The dataset to use for testing. Available datasets are: iris, heart, rice, all. You can also pass the "
-             "relative path to a dataset in CSV format.",
+        "relative path to a dataset in CSV format.",
     )
     parser.add_argument(
         "classifier",
-        choices=["RandomForest", "DecisionForest", "all"],
+        choices=("RandomForest", "DecisionForest", "all"),
         help="The classifier to test.",
     )
     parser.add_argument(
@@ -180,14 +193,14 @@ if __name__ == "__main__":
     NT = (1, 10, 25, 50, 75, 100)
 
     if DATASET == "all":
-        datasets = ["iris", "heart", "rice"]
+        datasets = ("iris", "heart", "rice")
     else:
-        datasets = [DATASET]
+        datasets = tuple(DATASET)
 
     if CLASSIFIER == "all":
-        classifiers = ["RandomForest", "DecisionForest"]
+        classifiers = ("RandomForest", "DecisionForest")
     else:
-        classifiers = [CLASSIFIER]
+        classifiers = tuple(CLASSIFIER)
 
     for dataset in datasets:
         for classifier in classifiers:

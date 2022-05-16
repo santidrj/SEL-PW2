@@ -1,0 +1,36 @@
+\begin{table}[htbp]
+\centering
+\label{iris-features}
+\begin{tabular}{llllll}
+\toprule
+ &  & \multicolumn{4}{c}{Feature importance} \\
+ &  & #1 & #2 & #3 & #4 \\
+NT & F &  &  &  &  \\
+\midrule
+\multirow[c]{4}{*}{1} & 1 & petal_width & - & - & - \\
+ & 2 & petal_width & sepal_width & - & - \\
+ & 3 & petal_width & petal_length & sepal_length & - \\
+ & Runif & petal_length & petal_width & sepal_width & - \\
+\multirow[c]{4}{*}{10} & 1 & sepal_length & sepal_width & petal_length & petal_width \\
+ & 2 & petal_length & petal_width & sepal_width & sepal_length \\
+ & 3 & petal_width & sepal_width & sepal_length & petal_length \\
+ & Runif & petal_length & sepal_width & petal_width & sepal_length \\
+\multirow[c]{4}{*}{25} & 1 & petal_length & sepal_width & sepal_length & petal_width \\
+ & 2 & petal_width & sepal_length & petal_length & sepal_width \\
+ & 3 & petal_width & sepal_width & sepal_length & petal_length \\
+ & Runif & petal_width & petal_length & sepal_width & sepal_length \\
+\multirow[c]{4}{*}{50} & 1 & sepal_length & petal_length & petal_width & sepal_width \\
+ & 2 & petal_width & sepal_width & sepal_length & petal_length \\
+ & 3 & petal_length & sepal_width & sepal_length & petal_width \\
+ & Runif & petal_width & sepal_length & sepal_width & petal_length \\
+\multirow[c]{4}{*}{75} & 1 & petal_length & sepal_width & sepal_length & petal_width \\
+ & 2 & petal_width & sepal_length & sepal_width & petal_length \\
+ & 3 & petal_width & petal_length & sepal_length & sepal_width \\
+ & Runif & petal_width & petal_length & sepal_width & sepal_length \\
+\multirow[c]{4}{*}{100} & 1 & sepal_width & petal_width & sepal_length & petal_length \\
+ & 2 & sepal_length & sepal_width & petal_length & petal_width \\
+ & 3 & petal_length & petal_width & sepal_length & sepal_width \\
+ & Runif & petal_length & petal_width & sepal_length & sepal_width \\
+\bottomrule
+\end{tabular}
+\end{table}

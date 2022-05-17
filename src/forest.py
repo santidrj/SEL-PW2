@@ -22,9 +22,7 @@ class RandomForest(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y):
         if self.n_features > X.shape[1]:
-            raise ValueError(
-                f"Cannot fit data with less than {self.n_features} features."
-            )
+            raise ValueError(f"Cannot fit data with less than {self.n_features} features.")
 
         self.rules_count = {}
 
@@ -59,9 +57,7 @@ class RandomForest(BaseEstimator, ClassifierMixin):
             for f in keys:
                 f_v = self.rules_count.get(f, {})
                 r_v = r.get(f, {})
-                self.rules_count[f] = {
-                    k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)
-                }
+                self.rules_count[f] = {k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)}
         return list(self.rules_count.keys())
 
 
@@ -79,9 +75,7 @@ class DecisionForest(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y):
         if isinstance(self.n_features, int) and self.n_features > X.shape[1]:
-            raise ValueError(
-                f"Cannot fit data with less than {self.n_features} features."
-            )
+            raise ValueError(f"Cannot fit data with less than {self.n_features} features.")
 
         self.rules_count = {}
 
@@ -98,9 +92,7 @@ class DecisionForest(BaseEstimator, ClassifierMixin):
                 f_idx = self.rng.choice(x.columns, size=n_features, replace=False)
             else:
                 f_idx = self.rng.choice(x.columns, size=self.n_features, replace=False)
-            tree = CART(
-                max_depth=self.max_depth, min_size=self.min_size, random_state=self.rng
-            )
+            tree = CART(max_depth=self.max_depth, min_size=self.min_size, random_state=self.rng)
             tree.fit(x[f_idx], target)
             self.forest[t] = tree
             self.tree_features[t] = f_idx
@@ -131,7 +123,5 @@ class DecisionForest(BaseEstimator, ClassifierMixin):
             for f in keys:
                 f_v = self.rules_count.get(f, {})
                 r_v = r.get(f, {})
-                self.rules_count[f] = {
-                    k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)
-                }
+                self.rules_count[f] = {k: f_v.get(k, 0) + r_v.get(k, 0) for k in set(f_v) | set(r_v)}
         return list(self.rules_count.keys())

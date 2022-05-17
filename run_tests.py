@@ -168,14 +168,16 @@ if __name__ == "__main__":
         "--jobs",
         help="The number of jobs to run in parallel. It defaults to -1 to use all the available CPUs. Defaults to -1.",
         default=-1,
+        type=int,
     )
     parser.add_argument(
         "-n",
         "--n_splits",
         help="The number of splits for the StratifiedKFold. Defaults to 5.",
         default=5,
+        type=int,
     )
-    parser.add_argument("-s", "--seed", default=None)
+    parser.add_argument("-s", "--seed", default=None, type=int)
     parser.add_argument("-v", "--verbose", action="store_true")
 
     args = parser.parse_args()

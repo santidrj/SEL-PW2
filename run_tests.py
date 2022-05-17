@@ -1,4 +1,5 @@
 import os.path
+import sys
 from argparse import ArgumentParser
 from math import log, sqrt
 from typing import Tuple
@@ -99,6 +100,7 @@ def run_cross_validation(
                 scoring="accuracy",
                 cv=StratifiedKFold(n_splits, random_state=seed),
                 n_jobs=n_jobs,
+                pre_dispatch="2*n_jobs",
                 return_estimator=True,
             )
 
@@ -166,8 +168,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-j",
         "--jobs",
-        help="The number of jobs to run in parallel. It defaults to -1 to use all the available CPUs. Defaults to -1.",
-        default=-1,
+        help="The number of jobs to run in parallel. If -1 uses all the available CPUs. "
+        "This may cause a RecursionError if the data is too large. Defaults to 1.",
+        default=1,
         type=int,
     )
     parser.add_argument(
@@ -187,6 +190,9 @@ if __name__ == "__main__":
     N_SPLITS = args.n_splits
     SEED = args.seed
     VERBOSE = args.verbose
+
+    if N_JOBS == -1:
+        sys.setrecursionlimit(10000)
 
     OUTPUT_DIR = "output"
     if not os.path.exists(OUTPUT_DIR):

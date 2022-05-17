@@ -5,7 +5,8 @@ from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 
 # logging.basicConfig(level=logging.DEBUG)
-from src.forest import DecisionForest
+from src.datasets import load_rice
+from src.forest import DecisionForest, RandomForest
 
 df = pd.DataFrame(
     {
@@ -38,12 +39,10 @@ df = pd.DataFrame(
     }
 )
 
-iris = load_iris()
-x_train, x_test, y_train, y_test = train_test_split(
-    iris.data, iris.target, test_size=0.2
-)
-# forest = RandomForest(2, 3)
-forest = DecisionForest("Runif", 10)
+rice, labels = load_rice()
+x_train, x_test, y_train, y_test = train_test_split(rice, labels, test_size=0.2)
+forest = RandomForest(1, 1)
+# forest = DecisionForest("Runif", 10)
 forest.fit(x_train, y_train)
 predictions = forest.predict(x_test)
 print(classification_report(y_test, predictions))

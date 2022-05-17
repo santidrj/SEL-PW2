@@ -1,12 +1,15 @@
+import logging
+
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 
-# logging.basicConfig(level=logging.DEBUG)
-from src.datasets import load_rice
+from src.datasets import load_rice, load_heart
 from src.forest import DecisionForest, RandomForest
+
+logging.basicConfig(level=logging.DEBUG)
 
 df = pd.DataFrame(
     {
@@ -39,7 +42,7 @@ df = pd.DataFrame(
     }
 )
 
-rice, labels = load_rice()
+rice, labels = load_heart()
 x_train, x_test, y_train, y_test = train_test_split(rice, labels, test_size=0.2)
 forest = RandomForest(1, 1)
 # forest = DecisionForest("Runif", 10)
@@ -50,3 +53,4 @@ print(classification_report(y_test, predictions))
 ConfusionMatrixDisplay.from_predictions(y_test, predictions, normalize="true")
 plt.show()
 print(forest.rule_count())
+print(forest.forest[0])

@@ -15,30 +15,28 @@ def load_heart():
     df = pd.read_csv(
         os.path.join(DATA_DIR, "heart.csv"),
         dtype={
-            "Age": np.int,
-            "Sex": str,
-            "ChestPainType": str,
-            "RestingBP": np.int,
-            "Cholesterol": np.int,
-            "FastingBS": str,
-            "RestingECG": str,
-            "MaxHR": np.int,
-            "ExerciseAngina": str,
+            "Age": "category",
+            "Sex": "category",
+            "ChestPainType": "category",
+            "RestingBP": "category",
+            "Cholesterol": "category",
+            "FastingBS": "category",
+            "RestingECG": "category",
+            "MaxHR": "category",
+            "ExerciseAngina": "category",
             "Oldpeak": np.float,
-            "ST_Slope": str,
+            "ST_Slope": "category",
             "HeartDisease": np.int,
         },
     )
     df["HeartDisease"] = df["HeartDisease"].map({0: "No", 1: "Yes"})
-    return df.drop(columns="HeartDisease"), df["HeartDisease"]
+    return df.drop(columns="HeartDisease"), df["HeartDisease"].astype("category")
 
 
-def load_rice():
-    data, meta = arff.loadarff(os.path.join(DATA_DIR, "Rice_Cammeo_Osmancik.arff"))
-    df = pd.DataFrame(data)
-    class_col = "Class"
-    df[class_col] = df[class_col].str.decode("utf-8")
-    return df.drop(columns=class_col), df[class_col]
+def load_nursery():
+    df = pd.read_csv(os.path.join(DATA_DIR, "nursery.csv"), dtype="category")
+    df.rename(columns={"final evaluation": "class"}, inplace=True)
+    return df.drop(columns="class"), df["class"]
 
 
 def load_dataset(dataset_path: str, has_class=True):
@@ -52,5 +50,5 @@ def load_dataset(dataset_path: str, has_class=True):
 
     df = pd.read_csv(dataset_path)
     if has_class:
-        return df.drop(columns=df.columns[-1]), df[df.columns[-1]]
+        return df.drop(columns=df.columns[-1]), df[df.columns[-1]].astype("category")
     return df

@@ -61,8 +61,10 @@ class CART:
         self._validate_input()
 
     def __str__(self):
-        s = "Preorder representation:\n"
-        return s + self._print_tree(self.root)
+        header = "Preorder representation:\n"
+        s, rc = self._print_tree(self.root)
+        self.logger.debug(f'Number of recursive calls = {rc}')
+        return header + s
 
     def _validate_input(self):
         if self.max_depth == 0:
@@ -106,12 +108,14 @@ class CART:
         if len(left) < 1 or len(right) < 1:
             node.data = left.iloc[0, -1] if len(left) >= 1 else right.iloc[0, -1]
             node.is_leaf = True
+            self.logger.debug(f"Tree depth is {depth}.")
             return
 
         del node.data["split"]
         if 0 < self.max_depth <= depth:
             node.left = TreeNode(left.iloc[0, -1], True)
             node.right = TreeNode(right.iloc[0, -1], True)
+            self.logger.debug(f"Tree depth is {depth}.")
             return
 
         if len(left) <= self.min_size:
@@ -154,9 +158,6 @@ class CART:
                 self.rule_count[best_feature].get(best_value, 0) + 1
             )
 
-        self.logger.info(
-            f"Final split with gini index {best_gini} using feature {best_feature} and value/s {best_value}"
-        )
         return {"feature": best_feature, "value": best_value, "split": best_split}
 
     def _generate_splits(self, X, col):
@@ -180,7 +181,6 @@ class CART:
             if best_gini == 0.0 or i >= max_combinations:
                 break
 
-        self.logger.info(f"Best split: {best_split} with gini index {best_gini}")
         return best_split, best_value, best_gini
 
     def _feature_splits(self, X, col_data, v, numerical):
@@ -215,9 +215,10 @@ class CART:
                 gini += (g.shape[0] / n_samples) * score
         return gini
 
-    def _print_tree(self, node, depth=0):
+    def _print_tree(self, node, depth=0, rc=0):
+        rc += 1
         if node.is_leaf:
-            return f"At level {depth} class {node.data}\n"
+            return f"At level {depth} class {node.data}\n", rc
         else:
             if node.data["feature"] in self.numerical_columns:
                 s = f'At level {depth} [feature {node.data["feature"]} <= {node.data["value"]}?]\n'
@@ -227,9 +228,13 @@ class CART:
                     condition += f" {f} or"
                 condition = condition[:-3]  # remove last or
                 s = f'At level {depth} [feature {node.data["feature"]} is{condition}?]\n'
-            s += self._print_tree(node.left, depth + 1)
-            s += self._print_tree(node.right, depth + 1)
-            return s
+            s1, rc1 = self._print_tree(node.left, depth + 1, rc)
+            s += s1
+            rc = rc1
+            s1, rc1 = self._print_tree(node.right, depth + 1, rc)
+            s += s1
+            rc = rc1
+            return s, rc
 
     def __predict_sample(self, node, sample):
         if node.is_leaf:

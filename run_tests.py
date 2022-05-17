@@ -1,5 +1,4 @@
 import os.path
-import sys
 from argparse import ArgumentParser
 from math import log, sqrt
 from typing import Tuple
@@ -9,12 +8,12 @@ import pandas as pd
 from pandas import DataFrame
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
-from src.datasets import load_dataset, load_heart, load_iris, load_rice
+from src.datasets import load_dataset, load_heart, load_iris, load_nursery
 from src.forest import DecisionForest, RandomForest
 
 
 def test_random_forest(
-    dataset_name, classifier_name, n_splits=5, n_jobs=None, seed=None, verbose=False
+    dataset_name, classifier_name, max_depth=-1, min_size=1, n_splits=5, n_jobs=None, seed=None, verbose=False
 ) -> Tuple[DataFrame, DataFrame]:
     """
     Perform cross-validation with a given dataset and classifier with a predefined number of combinations of number of
@@ -30,6 +29,11 @@ def test_random_forest(
         that the class labels are at the last column.
     classifier_name : str
         The classifier to use. Either RandomForest or DecisionForest.
+    max_depth : int, default=-1
+        The maximum depth for the generated tree.
+        If max_depth is -1 the method will run until the tree can no longer grow.
+    min_size : int, default=1
+        The minimum size that each leaf node must have.
     n_splits :
         The number of splits for the `StratifiedKFold` used for cross-validation.
     n_jobs :
@@ -51,8 +55,8 @@ def test_random_forest(
         X, y = load_iris()
     elif dataset_name == "heart":
         X, y = load_heart()
-    elif dataset_name == "rice":
-        X, y = load_rice()
+    elif dataset_name == "nursery":
+        X, y = load_nursery()
     else:
         X, y = load_dataset(dataset_name)
         dataset_name = os.path.basename(dataset_name).split(".")[0]
@@ -70,16 +74,16 @@ def test_random_forest(
         print(f"\nStarting tests for {classifier_name} with dataset {dataset_name}")
     if classifier_name == "RandomForest":
         return run_cross_validation(
-            X, y, RandomForest, dataset_name, f, n_jobs, n_splits, seed, verbose
+            X, y, RandomForest, dataset_name, f, max_depth, min_size, n_jobs, n_splits, seed, verbose
         )
     else:
         return run_cross_validation(
-            X, y, DecisionForest, dataset_name, f, n_jobs, n_splits, seed, verbose
+            X, y, DecisionForest, dataset_name, f, max_depth, min_size, n_jobs, n_splits, seed, verbose
         )
 
 
 def run_cross_validation(
-    X, y, classifier, dataset_name, f, n_jobs, n_splits, seed, verbose
+    X, y, classifier, dataset_name, f, max_depth, min_size, n_jobs, n_splits, seed, verbose
 ):
     results = pd.DataFrame(index=f, columns=NT)
     results = results.rename_axis(index="F")
@@ -92,7 +96,7 @@ def run_cross_validation(
             if verbose:
                 print(f"Starting cross validation for NT={nt} and F={n_features}")
 
-            forest = classifier(n_features, nt)
+            forest = classifier(n_features, nt, max_depth=max_depth, min_size=min_size, seed=seed)
             cv_results = cross_validate(
                 forest,
                 X,
@@ -157,7 +161,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument(
         "dataset",
-        help="The dataset to use for testing. Available datasets are: iris, heart, rice, all. You can also pass the "
+        help="The dataset to use for testing. Available datasets are: iris, heart, nursery, all. You can also pass the "
         "relative path to a dataset in CSV format.",
     )
     parser.add_argument(
@@ -180,6 +184,19 @@ if __name__ == "__main__":
         default=5,
         type=int,
     )
+    parser.add_argument(
+        "-d",
+        "--max_depth",
+        help="The maximum depth of the trees. Use -1 for no limit. Defaults to -1 expect for rice dataset wich is 300.",
+        default=-1,
+        type=int,
+    )
+    parser.add_argument(
+        "--min_size",
+        help="The minimum size that each node must have. Defaults to 1.",
+        default=1,
+        type=int,
+    )
     parser.add_argument("-s", "--seed", default=None, type=int)
     parser.add_argument("-v", "--verbose", action="store_true")
 
@@ -190,9 +207,12 @@ if __name__ == "__main__":
     N_SPLITS = args.n_splits
     SEED = args.seed
     VERBOSE = args.verbose
-
-    if N_JOBS == -1:
-        sys.setrecursionlimit(10000)
+    MIN_SIZE = args.min_size
+    # if DATASET == 'rice':
+    #     MAX_DEPTH = 301
+    # else:
+    #     MAX_DEPTH = args.max_depth
+    MAX_DEPTH = args.max_depth
 
     OUTPUT_DIR = "output"
     if not os.path.exists(OUTPUT_DIR):
@@ -201,7 +221,7 @@ if __name__ == "__main__":
     NT = (1, 10, 25, 50, 75, 100)
 
     if DATASET == "all":
-        datasets = ("iris", "heart", "rice")
+        datasets = ("iris", "heart", "nursery")
     else:
         datasets = [DATASET]
 
@@ -212,4 +232,4 @@ if __name__ == "__main__":
 
     for dataset in datasets:
         for classifier in classifiers:
-            test_random_forest(dataset, classifier, N_SPLITS, N_JOBS, SEED, VERBOSE)
+            test_random_forest(dataset, classifier, MAX_DEPTH, MIN_SIZE, N_SPLITS, N_JOBS, SEED, VERBOSE)

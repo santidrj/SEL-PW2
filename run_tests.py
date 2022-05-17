@@ -82,9 +82,7 @@ def test_random_forest(
         )
 
 
-def run_cross_validation(
-    X, y, classifier, dataset_name, f, max_depth, min_size, n_jobs, n_splits, seed, verbose
-):
+def run_cross_validation(X, y, classifier, dataset_name, f, max_depth, min_size, n_jobs, n_splits, seed, verbose):
     results = pd.DataFrame(index=f, columns=NT)
     results = results.rename_axis(index="F")
     index = pd.MultiIndex.from_product([NT, f], names=["NT", "F"])
@@ -114,24 +112,18 @@ def run_cross_validation(
             rules = estimator.rule_count()
             features[: len(rules)] = rules
             feature_importance.loc[(nt, n_features)] = features
-            output_lines[
-                i * len(f) + j
-            ] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.rule_count()}\n"
+            output_lines[i * len(f) + j] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.rule_count()}\n"
 
             results.loc[n_features, nt] = np.mean(cv_results["test_score"])
 
-    results.columns = pd.MultiIndex.from_tuples(
-        map(lambda x: ("NT", x), results.columns)
-    )
+    results.columns = pd.MultiIndex.from_tuples(map(lambda x: ("NT", x), results.columns))
     results = results.round(decimals=4)
     feature_importance.columns = pd.MultiIndex.from_tuples(
         map(lambda x: ("Feature importance", x), feature_importance.columns)
     )
     output_file = os.path.join(OUTPUT_DIR, f"{classifier.__name__}-{dataset_name}")
 
-    with open(
-        f"{output_file}-feature-relevance.txt", "w"
-    ) as f:
+    with open(f"{output_file}-feature-relevance.txt", "w") as f:
         f.writelines(output_lines)
 
     results.to_pickle(f"{output_file}-results.pkl")
@@ -170,6 +162,19 @@ if __name__ == "__main__":
         help="The classifier to test.",
     )
     parser.add_argument(
+        "-d",
+        "--max_depth",
+        help="The maximum depth of the trees. Use -1 for no limit. Defaults to -1 expect for rice dataset wich is 300.",
+        default=-1,
+        type=int,
+    )
+    parser.add_argument(
+        "--min_size",
+        help="The minimum size that each node must have. Defaults to 1.",
+        default=1,
+        type=int,
+    )
+    parser.add_argument(
         "-j",
         "--jobs",
         help="The number of jobs to run in parallel. If -1 uses all the available CPUs. "
@@ -184,35 +189,18 @@ if __name__ == "__main__":
         default=5,
         type=int,
     )
-    parser.add_argument(
-        "-d",
-        "--max_depth",
-        help="The maximum depth of the trees. Use -1 for no limit. Defaults to -1 expect for rice dataset wich is 300.",
-        default=-1,
-        type=int,
-    )
-    parser.add_argument(
-        "--min_size",
-        help="The minimum size that each node must have. Defaults to 1.",
-        default=1,
-        type=int,
-    )
     parser.add_argument("-s", "--seed", default=None, type=int)
     parser.add_argument("-v", "--verbose", action="store_true")
 
     args = parser.parse_args()
     DATASET = args.dataset
     CLASSIFIER = args.classifier
+    MAX_DEPTH = args.max_depth
+    MIN_SIZE = args.min_size
     N_JOBS = args.jobs
     N_SPLITS = args.n_splits
     SEED = args.seed
     VERBOSE = args.verbose
-    MIN_SIZE = args.min_size
-    # if DATASET == 'rice':
-    #     MAX_DEPTH = 301
-    # else:
-    #     MAX_DEPTH = args.max_depth
-    MAX_DEPTH = args.max_depth
 
     OUTPUT_DIR = "output"
     if not os.path.exists(OUTPUT_DIR):

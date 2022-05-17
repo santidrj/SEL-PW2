@@ -6,7 +6,7 @@ from sklearn.datasets import load_iris
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 
-from src.datasets import load_rice, load_heart
+from src.datasets import load_heart, load_rice
 from src.forest import DecisionForest, RandomForest
 
 logging.basicConfig(level=logging.DEBUG)

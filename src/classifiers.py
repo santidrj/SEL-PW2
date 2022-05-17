@@ -68,15 +68,11 @@ class CART:
 
     def _validate_input(self):
         if self.max_depth == 0:
-            raise ValueError(
-                "max_depth must be greater than 0 or -1 for no depth check."
-            )
+            raise ValueError("max_depth must be greater than 0 or -1 for no depth check.")
         if self.min_size < 1:
             raise ValueError("min_size must be greater than 0.")
         if self.n_features == 0:
-            raise ValueError(
-                "n_features must be greater than 0 or -1 to use all features."
-            )
+            raise ValueError("n_features must be greater than 0 or -1 to use all features.")
 
     def fit(self, X, y):
         if not isinstance(X, DataFrame):
@@ -154,9 +150,7 @@ class CART:
 
         if len(best_split[0]) > 0 and len(best_split[1]) > 0:
             self.rule_count[best_feature] = self.rule_count.get(best_feature, {})
-            self.rule_count[best_feature][best_value] = (
-                self.rule_count[best_feature].get(best_value, 0) + 1
-            )
+            self.rule_count[best_feature][best_value] = self.rule_count[best_feature].get(best_value, 0) + 1
 
         return {"feature": best_feature, "value": best_value, "split": best_split}
 

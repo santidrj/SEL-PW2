@@ -126,7 +126,7 @@ def run_cross_validation(
     output_file = os.path.join(OUTPUT_DIR, f"{classifier.__name__}-{dataset_name}")
 
     with open(
-        os.path.join(OUTPUT_DIR, f"{output_file}-feature-relevance.txt"), "w"
+        f"{output_file}-feature-relevance.txt", "w"
     ) as f:
         f.writelines(output_lines)
 

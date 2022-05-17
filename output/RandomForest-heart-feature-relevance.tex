@@ -1,0 +1,30 @@
+\begin{table}[htbp]
+\centering
+\label{heart-features}
+\begin{tabular}{lllllllllllll}
+\toprule
+ &  & \multicolumn{11}{c}{Feature importance} \\
+ &  & #1 & #2 & #3 & #4 & #5 & #6 & #7 & #8 & #9 & #10 & #11 \\
+NT & F &  &  &  &  &  &  &  &  &  &  &  \\
+\midrule
+\multirow[c]{3}{*}{1} & 1 & MaxHR & RestingECG & Age & ST_Slope & RestingBP & ExerciseAngina & FastingBS & Cholesterol & ChestPainType & Oldpeak & Sex \\
+ & 3 & MaxHR & ExerciseAngina & Sex & Cholesterol & Oldpeak & ChestPainType & RestingECG & Age & RestingBP & FastingBS & ST_Slope \\
+ & 4 & Sex & ST_Slope & Oldpeak & ChestPainType & MaxHR & RestingECG & Cholesterol & Age & ExerciseAngina & RestingBP & FastingBS \\
+\multirow[c]{3}{*}{10} & 1 & ST_Slope & MaxHR & Sex & ExerciseAngina & Oldpeak & ChestPainType & RestingECG & Age & FastingBS & Cholesterol & RestingBP \\
+ & 3 & Cholesterol & ChestPainType & RestingBP & RestingECG & Sex & MaxHR & FastingBS & ST_Slope & Age & ExerciseAngina & Oldpeak \\
+ & 4 & Oldpeak & FastingBS & ST_Slope & MaxHR & Age & RestingBP & Cholesterol & RestingECG & ExerciseAngina & Sex & ChestPainType \\
+\multirow[c]{3}{*}{25} & 1 & Sex & RestingECG & MaxHR & Cholesterol & RestingBP & ChestPainType & FastingBS & ExerciseAngina & ST_Slope & Age & Oldpeak \\
+ & 3 & ST_Slope & Cholesterol & MaxHR & FastingBS & RestingBP & Oldpeak & RestingECG & Age & ExerciseAngina & Sex & ChestPainType \\
+ & 4 & ExerciseAngina & ST_Slope & RestingBP & MaxHR & Cholesterol & ChestPainType & Oldpeak & Age & Sex & RestingECG & FastingBS \\
+\multirow[c]{3}{*}{50} & 1 & RestingBP & FastingBS & ExerciseAngina & ST_Slope & Age & MaxHR & RestingECG & ChestPainType & Cholesterol & Oldpeak & Sex \\
+ & 3 & ST_Slope & ExerciseAngina & Age & ChestPainType & Cholesterol & FastingBS & Sex & MaxHR & RestingBP & RestingECG & Oldpeak \\
+ & 4 & Oldpeak & ST_Slope & ChestPainType & Cholesterol & MaxHR & Age & ExerciseAngina & RestingBP & RestingECG & FastingBS & Sex \\
+\multirow[c]{3}{*}{75} & 1 & Sex & ST_Slope & ExerciseAngina & RestingBP & RestingECG & Cholesterol & ChestPainType & Oldpeak & FastingBS & Age & MaxHR \\
+ & 3 & MaxHR & ChestPainType & ExerciseAngina & Oldpeak & Sex & Age & ST_Slope & RestingBP & FastingBS & Cholesterol & RestingECG \\
+ & 4 & ChestPainType & ST_Slope & Oldpeak & Cholesterol & MaxHR & RestingBP & FastingBS & Age & RestingECG & Sex & ExerciseAngina \\
+\multirow[c]{3}{*}{100} & 1 & RestingECG & Sex & ChestPainType & MaxHR & ExerciseAngina & Oldpeak & Age & Cholesterol & ST_Slope & RestingBP & FastingBS \\
+ & 3 & Cholesterol & ST_Slope & MaxHR & FastingBS & ExerciseAngina & Sex & RestingECG & Oldpeak & Age & ChestPainType & RestingBP \\
+ & 4 & ST_Slope & FastingBS & ExerciseAngina & Cholesterol & Age & MaxHR & RestingBP & Oldpeak & ChestPainType & Sex & RestingECG \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,17 +1,11 @@
-import logging
-from math import ceil, log
-
-import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn.datasets import load_breast_cancer, load_iris
+from sklearn.datasets import load_iris
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 
-from src.classifiers import CART
-
 # logging.basicConfig(level=logging.DEBUG)
-from src.forest import DecisionForest, RandomForest
+from src.forest import DecisionForest
 
 df = pd.DataFrame(
     {

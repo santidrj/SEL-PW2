@@ -4,7 +4,7 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-from numpy.random import Generator, RandomState
+from numpy.random import Generator
 from pandas import DataFrame
 
 

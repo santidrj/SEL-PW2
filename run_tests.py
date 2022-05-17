@@ -195,12 +195,12 @@ if __name__ == "__main__":
     if DATASET == "all":
         datasets = ("iris", "heart", "rice")
     else:
-        datasets = tuple(DATASET)
+        datasets = [DATASET]
 
     if CLASSIFIER == "all":
         classifiers = ("RandomForest", "DecisionForest")
     else:
-        classifiers = tuple(CLASSIFIER)
+        classifiers = [CLASSIFIER]
 
     for dataset in datasets:
         for classifier in classifiers:

@@ -102,31 +102,43 @@ class CART:
         left = node.data["split"][0].copy()
         right = node.data["split"][1].copy()
         if len(left) < 1 or len(right) < 1:
-            node.data = left.iloc[0, -1] if len(left) >= 1 else right.iloc[0, -1]
+            data = left.iloc[:, -1].mode() if len(left) >= 1 else right.iloc[0, -1].mode()
+            node.data = data[0] if len(data) == 1 else self.rng.choice(data)
             node.is_leaf = True
             self.logger.debug(f"Tree depth is {depth}.")
             return
 
         del node.data["split"]
         if 0 < self.max_depth <= depth:
-            node.left = TreeNode(left.iloc[0, -1], True)
-            node.right = TreeNode(right.iloc[0, -1], True)
+            data = self._get_target_class(left)
+            node.left = TreeNode(data, True)
+            data = self._get_target_class(right)
+            node.right = TreeNode(data, True)
             self.logger.debug(f"Tree depth is {depth}.")
             return
 
         if len(left) <= self.min_size:
-            node.left = TreeNode(left.iloc[0, -1], True)
+            data = self._get_target_class(left)
+            node.left = TreeNode(data, True)
         else:
             left_split = self._get_split(left)
             node.left = TreeNode(left_split)
             self._grow_tree(node.left, depth + 1)
 
         if len(right) <= self.min_size:
-            node.right = TreeNode(right.iloc[0, -1], True)
+            data = self._get_target_class(right)
+            node.right = TreeNode(data, True)
         else:
             right_split = self._get_split(right)
             node.right = TreeNode(right_split)
             self._grow_tree(node.right, depth + 1)
+
+    def _get_target_class(self, node):
+        # If there are multiple classes with the same values for the selected features choose the most common class.
+        # If there is a tie between classes, choose the target class randomly.
+        target_class = node.iloc[:, -1].mode()
+        target_class = target_class[0] if len(target_class) == 1 else self.rng.choice(target_class)
+        return target_class
 
     def _get_split(self, X):
         best_gini, best_value, best_feature, best_split = np.Inf, None, None, None

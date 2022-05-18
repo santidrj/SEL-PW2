@@ -9,8 +9,8 @@ from numpy.random import Generator
 from pandas import DataFrame
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
-from src.datasets import load_dataset, load_heart, load_iris, load_nursery
-from src.forest import DecisionForest, RandomForest
+from source.datasets import load_dataset, load_heart, load_iris, load_nursery
+from source.forest import DecisionForest, RandomForest
 
 
 def test_random_forest(
@@ -94,7 +94,7 @@ def run_cross_validation(X, y, classifier, dataset_name, f, max_depth, min_size,
     results = pd.DataFrame(index=f, columns=NT)
     results = results.rename_axis(index="F")
     index = pd.MultiIndex.from_product([NT, f], names=["NT", "F"])
-    col_names = [f"#{i + 1}" for i in range(X.shape[1])]
+    col_names = [f"\\#{i + 1}" for i in range(X.shape[1])]
     feature_importance = pd.DataFrame(index=index, columns=col_names, dtype=str)
     output_lines = np.empty((len(NT) * len(f),), dtype=object)
     for i, nt in enumerate(NT):
@@ -117,10 +117,10 @@ def run_cross_validation(X, y, classifier, dataset_name, f, max_depth, min_size,
             acc = cv_results["test_score"]
             estimator = cv_results["estimator"][np.argmax(acc)]
             features = np.full(X.shape[1], "-", dtype=object)
-            rules = estimator.rule_count()
+            rules = estimator.feature_importance()
             features[: len(rules)] = rules
             feature_importance.loc[(nt, n_features)] = features
-            output_lines[i * len(f) + j] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.rule_count()}\n"
+            output_lines[i * len(f) + j] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.feature_importance()}\n"
 
             results.loc[n_features, nt] = np.mean(cv_results["test_score"])
 

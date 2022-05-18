@@ -6,7 +6,7 @@ from pandas import DataFrame, Series
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import resample
 
-from src.classifiers import CART
+from source.classifiers import CART
 
 
 class RandomForest(BaseEstimator, ClassifierMixin):
@@ -27,7 +27,6 @@ class RandomForest(BaseEstimator, ClassifierMixin):
         self.rules_count = {}
 
         for t in range(self.n_trees):
-            resample(X, y, random_state=self.seed)
             x, target = resample(X, y, random_state=self.seed)
             tree = CART(
                 max_depth=self.max_depth,
@@ -47,7 +46,7 @@ class RandomForest(BaseEstimator, ClassifierMixin):
             preds.append(v[i])
         return np.array(preds)
 
-    def rule_count(self):
+    def feature_importance(self):
         if self.rules_count:
             return list(self.rules_count.keys())
 
@@ -113,7 +112,7 @@ class DecisionForest(BaseEstimator, ClassifierMixin):
             preds.append(v[i])
         return np.array(preds)
 
-    def rule_count(self):
+    def feature_importance(self):
         if self.rules_count:
             return list(self.rules_count.keys())
 

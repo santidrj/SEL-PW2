@@ -5,41 +5,10 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 
-from src.datasets import load_nursery
-from src.forest import RandomForest
+from source.datasets import load_nursery
+from source.forest import RandomForest
 
 # logging.basicConfig(level=logging.DEBUG)
-
-df = pd.DataFrame(
-    {
-        "eye-colour": [
-            "blue",
-            "blue",
-            "brown",
-            "green",
-            "green",
-            "brown",
-            "green",
-            "blue",
-            "red",
-            "red",
-        ],
-        "hair-colour": [
-            "blonde",
-            "brown",
-            "brown",
-            "green",
-            "brown",
-            "brown",
-            "blonde",
-            "brown",
-            "green",
-            "blonde",
-        ],
-        "height": [1.96, 1.75, 1.75, 1.63, 1.96, 1.45, 1.53, 1.69, 1.49, 1.85],
-        "class": ["c+", "c+", "c-", "c-", "c+", "c-", "c-", "c+", "c-", "c+"],
-    }
-)
 
 rice, labels = load_nursery()
 x_train, x_test, y_train, y_test = train_test_split(rice, labels, test_size=0.2)
@@ -51,4 +20,4 @@ print(classification_report(y_test, predictions))
 
 ConfusionMatrixDisplay.from_predictions(y_test, predictions, normalize="true")
 plt.show()
-print(forest.rule_count())
+print(forest.feature_importance())

@@ -1,10 +1,11 @@
 import os.path
 from argparse import ArgumentParser
 from math import log, sqrt
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 import pandas as pd
+from numpy.random import Generator
 from pandas import DataFrame
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
@@ -13,7 +14,14 @@ from src.forest import DecisionForest, RandomForest
 
 
 def test_random_forest(
-    dataset_name, classifier_name, max_depth=-1, min_size=1, n_splits=5, n_jobs=None, seed=None, verbose=False
+    dataset_name: str,
+    classifier_name: str,
+    max_depth: int = -1,
+    min_size: int = 1,
+    n_splits: int = 5,
+    n_jobs: Union[int, None] = None,
+    seed: Union[int, Generator, None] = None,
+    verbose: bool = False,
 ) -> Tuple[DataFrame, DataFrame]:
     """
     Perform cross-validation with a given dataset and classifier with a predefined number of combinations of number of
@@ -34,13 +42,13 @@ def test_random_forest(
         If max_depth is -1 the method will run until the tree can no longer grow.
     min_size : int, default=1
         The minimum size that each leaf node must have.
-    n_splits :
-        The number of splits for the `StratifiedKFold` used for cross-validation.
-    n_jobs :
+    n_splits : int, default=5
+        The number of splits for the `StratifiedKFold <sklearn.model_selection.StratifiedKFold>` used for cross-validation.
+    n_jobs : int or None, default=None
         Number of jobs to run in parallel. ``-1`` means using all processors.
-    seed :
+    seed : int, :class:`~numpy.random.Generator` or None, default=None
         Controls the pseudo number generator.
-    verbose:
+    verbose : bool, default=False
         If true print the progress of the test.
 
     Returns
@@ -164,7 +172,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d",
         "--max_depth",
-        help="The maximum depth of the trees. Use -1 for no limit. Defaults to -1 expect for rice dataset wich is 300.",
+        help="The maximum depth of the trees. Use -1 for no limit. Using -1 may cause a RecursionError if the data is "
+        "not easily split, please consider setting a suitable depth. Defaults to -1.",
         default=-1,
         type=int,
     )
@@ -177,8 +186,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-j",
         "--jobs",
-        help="The number of jobs to run in parallel. If -1 uses all the available CPUs. "
-        "This may cause a RecursionError if the data is too large. Defaults to 1.",
+        help="The number of jobs to run in parallel. If -1 uses all the available CPUs. Defaults to 1.",
         default=1,
         type=int,
     )

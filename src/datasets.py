@@ -15,14 +15,14 @@ def load_heart():
     df = pd.read_csv(
         os.path.join(DATA_DIR, "heart.csv"),
         dtype={
-            "Age": "category",
+            "Age": np.int,
             "Sex": "category",
             "ChestPainType": "category",
-            "RestingBP": "category",
-            "Cholesterol": "category",
+            "RestingBP": np.int,
+            "Cholesterol": np.int,
             "FastingBS": "category",
             "RestingECG": "category",
-            "MaxHR": "category",
+            "MaxHR": np.int,
             "ExerciseAngina": "category",
             "Oldpeak": np.float,
             "ST_Slope": "category",

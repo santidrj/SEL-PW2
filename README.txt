@@ -20,8 +20,10 @@ After the installation, you can run the experiments with the run_experiments.py 
 !!!The run_experiments.py must be in the same location that the source and data folders!!!
 
 Also, you might need to add the current folder to your PYTHONPATH environment variable.
-To do so in Unix systems you can run:
+To do so in Unix-like systems you can run:
 export PYTHONPATH=`pwd`:$PYTHONPATH
+In Windows run:
+$Env:PYTHONPATH += pwd
 
 
 usage: run_experiments.py [-h] [-d MAX_DEPTH] [--min_size MIN_SIZE] [-j JOBS] [-n N_SPLITS] [-s SEED] [-v] dataset {RandomForest,DecisionForest,all}

@@ -9,8 +9,8 @@ from numpy.random import Generator
 from pandas import DataFrame
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
-from source.datasets import load_dataset, load_heart, load_iris, load_nursery
-from source.forest import DecisionForest, RandomForest
+from src.datasets import load_dataset, load_heart, load_iris, load_nursery
+from src.forest import DecisionForest, RandomForest
 
 
 def test_random_forest(
@@ -118,7 +118,7 @@ def run_cross_validation(X, y, classifier, dataset_name, f, max_depth, min_size,
             estimator = cv_results["estimator"][np.argmax(acc)]
             features = np.full(X.shape[1], "-", dtype=object)
             rules = estimator.feature_importance()
-            features[: len(rules)] = rules
+            features[: len(rules)] = [s.replace('_', '\\_') for s in rules]
             feature_importance.loc[(nt, n_features)] = features
             output_lines[i * len(f) + j] = f"Feature relevance for NT={nt}, F={n_features}: {estimator.feature_importance()}\n"
 

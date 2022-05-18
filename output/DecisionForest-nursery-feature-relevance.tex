@@ -7,30 +7,30 @@
  &  & #1 & #2 & #3 & #4 & #5 & #6 & #7 & #8 \\
 NT & F &  &  &  &  &  &  &  &  \\
 \midrule
-\multirow[c]{4}{*}{1} & 2 & health & form & - & - & - & - & - & - \\
- & 4 & health & finance & has_nurs & form & - & - & - & - \\
- & 6 & health & social & has_nurs & housing & finance & form & - & - \\
- & Runif & health & has_nurs & social & parents & - & - & - & - \\
-\multirow[c]{4}{*}{10} & 2 & parents & social & children & form & has_nurs & health & finance & housing \\
- & 4 & has_nurs & form & housing & social & health & finance & parents & children \\
- & 6 & health & has_nurs & housing & children & form & parents & social & finance \\
+\multirow[c]{4}{*}{1} & 2 & health & finance & - & - & - & - & - & - \\
+ & 4 & health & children & has_nurs & housing & - & - & - & - \\
+ & Runif & health & social & - & - & - & - & - & - \\
+ & 6 & health & has_nurs & social & housing & finance & children & - & - \\
+\multirow[c]{4}{*}{10} & 2 & health & form & has_nurs & social & housing & children & parents & finance \\
+ & 4 & parents & form & housing & finance & health & social & children & has_nurs \\
+ & Runif & has_nurs & housing & social & health & parents & form & children & finance \\
+ & 6 & has_nurs & parents & housing & social & children & form & health & finance \\
+\multirow[c]{4}{*}{25} & 2 & housing & children & has_nurs & social & health & parents & finance & form \\
+ & 4 & health & has_nurs & housing & finance & parents & social & children & form \\
  & Runif & health & social & has_nurs & parents & form & children & housing & finance \\
-\multirow[c]{4}{*}{25} & 2 & parents & has_nurs & housing & form & health & finance & social & children \\
- & 4 & health & children & social & housing & form & finance & parents & has_nurs \\
- & 6 & health & form & parents & social & housing & children & finance & has_nurs \\
- & Runif & has_nurs & housing & social & form & health & parents & children & finance \\
-\multirow[c]{4}{*}{50} & 2 & housing & form & health & parents & social & has_nurs & finance & children \\
- & 4 & housing & social & children & form & parents & has_nurs & finance & health \\
- & 6 & has_nurs & form & children & housing & social & finance & health & parents \\
- & Runif & children & finance & has_nurs & form & health & parents & housing & social \\
-\multirow[c]{4}{*}{75} & 2 & children & finance & form & housing & social & has_nurs & health & parents \\
- & 4 & health & social & parents & has_nurs & children & form & finance & housing \\
- & 6 & health & form & parents & social & housing & finance & has_nurs & children \\
- & Runif & health & parents & form & finance & social & has_nurs & housing & children \\
-\multirow[c]{4}{*}{100} & 2 & health & housing & has_nurs & form & parents & children & social & finance \\
- & 4 & parents & social & children & finance & health & housing & form & has_nurs \\
- & 6 & health & form & parents & social & children & finance & has_nurs & housing \\
- & Runif & health & housing & has_nurs & social & parents & form & children & finance \\
+ & 6 & health & social & has_nurs & form & housing & finance & parents & children \\
+\multirow[c]{4}{*}{50} & 2 & finance & form & parents & health & social & children & has_nurs & housing \\
+ & 4 & health & has_nurs & children & form & social & housing & parents & finance \\
+ & Runif & health & social & finance & has_nurs & parents & housing & children & form \\
+ & 6 & health & has_nurs & social & parents & form & housing & finance & children \\
+\multirow[c]{4}{*}{75} & 2 & housing & children & has_nurs & health & parents & finance & form & social \\
+ & 4 & health & housing & children & form & has_nurs & social & finance & parents \\
+ & Runif & finance & health & housing & has_nurs & parents & children & form & social \\
+ & 6 & health & has_nurs & social & form & children & housing & parents & finance \\
+\multirow[c]{4}{*}{100} & 2 & children & form & social & parents & has_nurs & housing & finance & health \\
+ & 4 & health & has_nurs & parents & form & children & finance & social & housing \\
+ & Runif & has_nurs & form & social & finance & parents & housing & children & health \\
+ & 6 & has_nurs & parents & housing & finance & form & children & health & social \\
 \bottomrule
 \end{tabular}
 \end{table}

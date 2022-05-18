@@ -2,8 +2,8 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 
-from src.datasets import load_nursery
-from src.forest import RandomForest
+from source.datasets import load_nursery
+from source.forest import RandomForest
 
 # logging.basicConfig(level=logging.DEBUG)
 

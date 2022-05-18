@@ -9,8 +9,8 @@ from numpy.random import Generator
 from pandas import DataFrame
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
-from src.datasets import load_dataset, load_heart, load_iris, load_nursery
-from src.forest import DecisionForest, RandomForest
+from source.datasets import load_dataset, load_heart, load_iris, load_nursery
+from source.forest import DecisionForest, RandomForest
 
 
 def test_random_forest(

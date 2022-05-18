@@ -6,7 +6,7 @@ from pandas import DataFrame, Series
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import resample
 
-from src.classifiers import CART
+from source.classifiers import CART
 
 
 class RandomForest(BaseEstimator, ClassifierMixin):
